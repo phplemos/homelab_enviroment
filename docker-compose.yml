@@ -47,8 +47,6 @@ services:
     volumes:
       - ${PORTAINER_PATH}/data/adguard/work:/opt/adguardhome/work
       - ${PORTAINER_PATH}/data/adguard/conf:/opt/adguardhome/conf
-    networks:
-      - default
     # Não precisa mapear portas em 'host mode', ele abre as portas da máquina
 
   # --- CASA INTELIGENTE ---
