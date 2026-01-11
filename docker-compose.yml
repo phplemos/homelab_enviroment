@@ -1,4 +1,5 @@
 services:
+  # --- PROXY REVERSO ---
   web-proxy:
     image: caddy:latest
     container_name: web-proxy
@@ -14,6 +15,10 @@ services:
       - web-proxy
     environment:
       - CADDY_DOMAIN=${CADDY_DOMAIN}
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Permite o Caddy falar com o AdGuard/HA no Host
+
+  # --- AUTOMAÇÃO ---
   n8n:
     image: n8nio/n8n:stable
     container_name: n8n
@@ -21,58 +26,42 @@ services:
     environment:
       - GENERIC_TIMEZONE=${TIMEZONE}
       - TZ=${TIMEZONE}
+      # Importante para o n8n saber onde ele mora
+      - N8N_HOST=${CADDY_DOMAIN}
+      - WEBHOOK_URL=https://n8n.${CADDY_DOMAIN}/
     volumes:
       - ${PORTAINER_PATH}/data/n8n:/home/node/.n8n
     networks:
       - web-proxy
-  pihole:
-    image: pihole/pihole:latest
-    container_name: pihole
+
+  # --- DNS & REDE (Agora com AdGuard) ---
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguardhome
     restart: unless-stopped
-    hostname: pihole
-    dns:
-      - ${DNS1}
-      - ${DNS2}
-    environment:
-      - TZ=${TIMEZONE}
-      - WEBPASSWORD=${PIHOLE_PASSWORD}
-      - FTLCONF_LOCAL_IPV4=${PIHOLE_SERVERIP}
+    # Rede HOST: Ele pega o IP 192.168.1.200 direto.
+    # Sem conflito de isolamento. Muito mais rápido.
+    network_mode: host
     volumes:
-      - ${PORTAINER_PATH}/data/pihole/etc-pihole:/etc/pihole
-      - ${PORTAINER_PATH}/docker/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
-    networks:
-      macvlan_network:
-        ipv4_address: ${PIHOLE_SERVERIP}
+      - ${PORTAINER_PATH}/data/adguard/work:/opt/adguardhome/work
+      - ${PORTAINER_PATH}/data/adguard/conf:/opt/adguardhome/conf
+    # Não precisa mapear portas em 'host mode', ele abre as portas da máquina
+
+  # --- CASA INTELIGENTE ---
   homeassistant:
     image: lscr.io/linuxserver/homeassistant:latest
     container_name: homeassistant
-    dns:
-      - ${DNS1}
-      - ${DNS2}
+    restart: unless-stopped
+    # Rede HOST é crítica para Home Assistant descobrir dispositivos IoT
+    network_mode: host
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID}
+      - PGID=${PGID}
       - TZ=${TIMEZONE}
     volumes:
       - ${PORTAINER_PATH}/data/homeassistant:/config
       - /run/dbus:/run/dbus:ro
-    restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    networks:
-      macvlan_network:
-        ipv4_address: ${HOME_ASSISTANT_IP}
 
 networks:
   web-proxy:
     driver: bridge
-  macvlan_network:
-    driver: macvlan
-    driver_opts:
-      parent: ${INTERFACE}
-    ipam:
-      config:
-        - subnet: ${SUBNET}
-          gateway: ${GATEWAY}
-          ip_range: ${IPRANGE}

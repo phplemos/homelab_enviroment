@@ -3,17 +3,13 @@
     email phplemos.dev@gmail.com
 }
 
-# n8n (Internal Bridge - Can use container name)
-http://n8n.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy https://n8n:5678
+homelab.local {
+    tls internal
+    reverse_proxy portainer:9000
 }
 
-# Home Assistant (Macvlan - Must use Static IP)
-http://ha.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy 192.168.1.201:8123
-}
-
-# Pi-hole (Macvlan - Must use Static IP)
-http://pihole.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy {PIHOLE_SERVERIP}:80
+# Se quiser subdomínios (ex: n8n.homelab.local):
+n8n.homelab.local {
+    tls internal
+    reverse_proxy n8n:5678
 }
