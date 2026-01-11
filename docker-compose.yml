@@ -11,12 +11,12 @@ services:
       - ${PORTAINER_PATH}/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
       - ${PORTAINER_PATH}/data/caddy/data:/data
       - ${PORTAINER_PATH}/docker/caddy/config:/config
-    networks:
-      - web-proxy
     environment:
       - CADDY_DOMAIN=${CADDY_DOMAIN}
     extra_hosts:
       - "host.docker.internal:host-gateway" # Permite o Caddy falar com o AdGuard/HA no Host
+    networks:
+      - default
 
   # --- AUTOMAÇÃO ---
   n8n:
@@ -32,19 +32,23 @@ services:
     volumes:
       - ${PORTAINER_PATH}/data/n8n:/home/node/.n8n
     networks:
-      - web-proxy
+      - default
 
   # --- DNS & REDE (Agora com AdGuard) ---
   adguardhome:
     image: adguard/adguardhome
     container_name: adguardhome
     restart: unless-stopped
-    # Rede HOST: Ele pega o IP 192.168.1.200 direto.
-    # Sem conflito de isolamento. Muito mais rápido.
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "3000:80/tcp" 
     network_mode: host
     volumes:
       - ${PORTAINER_PATH}/data/adguard/work:/opt/adguardhome/work
       - ${PORTAINER_PATH}/data/adguard/conf:/opt/adguardhome/conf
+    networks:
+      - default
     # Não precisa mapear portas em 'host mode', ele abre as portas da máquina
 
   # --- CASA INTELIGENTE ---
@@ -63,5 +67,5 @@ services:
       - /run/dbus:/run/dbus:ro
 
 networks:
-  web-proxy:
+  default:
     driver: bridge
