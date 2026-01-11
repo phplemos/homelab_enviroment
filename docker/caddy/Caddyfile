@@ -1,19 +1,5 @@
-n8n.${CADDY_DOMAIN:localhost} {
-    tls internal
-    reverse_proxy n8n:5678
-}
-
-adguard.${CADDY_DOMAIN:localhost} {
+localhost {
     tls internal
     reverse_proxy adguardhome:3000
 }
 
-jellyfin.${CADDY_DOMAIN:localhost} {
-    tls internal
-    reverse_proxy jellyfin:8096
-}
-
-torrent.${CADDY_DOMAIN:localhost} {
-    tls internal
-    reverse_proxy qbittorrent:8080
-}
