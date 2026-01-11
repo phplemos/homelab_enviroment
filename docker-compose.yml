@@ -39,15 +39,10 @@ services:
     image: adguard/adguardhome
     container_name: adguardhome
     restart: unless-stopped
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "3000:80/tcp" 
     network_mode: host
     volumes:
       - ${PORTAINER_PATH}/data/adguard/work:/opt/adguardhome/work
       - ${PORTAINER_PATH}/data/adguard/conf:/opt/adguardhome/conf
-    # Não precisa mapear portas em 'host mode', ele abre as portas da máquina
 
   # --- CASA INTELIGENTE ---
   homeassistant:
