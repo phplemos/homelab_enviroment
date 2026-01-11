@@ -1,5 +1,4 @@
 services:
-  # --- 1. PROXY & SEGURANÇA (Caddy) ---
   web-proxy:
     image: caddy:latest
     container_name: web-proxy
@@ -18,7 +17,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  # --- 2. DNS & REDE (AdGuard Home) ---
   adguardhome:
     image: adguard/adguardhome
     container_name: adguardhome
@@ -26,14 +24,12 @@ services:
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "3000:80/tcp" # Painel Admin acessível na porta 3000 para não brigar com o Caddy
+      - "3000:80/tcp"
     volumes:
       - ${PORTAINER_PATH}/data/adguard/work:/opt/adguardhome/work
       - ${PORTAINER_PATH}/data/adguard/conf:/opt/adguardhome/conf
     networks:
       - web-proxy
-
-  # --- 4. AUTOMAÇÃO (n8n) ---
   n8n:
     image: n8nio/n8n:stable
     container_name: n8n
