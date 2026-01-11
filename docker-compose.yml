@@ -1,5 +1,5 @@
 services:
-  # --- PROXY REVERSO ---
+  # --- 1. PROXY & SEGURANÇA (Caddy) ---
   web-proxy:
     image: caddy:latest
     container_name: web-proxy
@@ -7,18 +7,44 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - CADDY_DOMAIN=${CADDY_DOMAIN}
     volumes:
       - ${PORTAINER_PATH}/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
       - ${PORTAINER_PATH}/data/caddy/data:/data
       - ${PORTAINER_PATH}/docker/caddy/config:/config
-    environment:
-      - CADDY_DOMAIN=${CADDY_DOMAIN}
-    extra_hosts:
-      - "host.docker.internal:host-gateway" # Permite o Caddy falar com o AdGuard/HA no Host
     networks:
-      - default
+      - web-proxy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-  # --- AUTOMAÇÃO ---
+  # --- 2. DNS & REDE (AdGuard Home) ---
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguardhome
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "3000:80/tcp" # Painel Admin acessível na porta 3000 para não brigar com o Caddy
+    volumes:
+      - ${PORTAINER_PATH}/data/adguard/work:/opt/adguardhome/work
+      - ${PORTAINER_PATH}/data/adguard/conf:/opt/adguardhome/conf
+    networks:
+      - web-proxy
+
+  # --- 3. GESTÃO (Portainer) ---
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PORTAINER_PATH}/docker/portainer:/data
+    networks:
+      - web-proxy
+
+  # --- 4. AUTOMAÇÃO (n8n) ---
   n8n:
     image: n8nio/n8n:stable
     container_name: n8n
@@ -26,30 +52,19 @@ services:
     environment:
       - GENERIC_TIMEZONE=${TIMEZONE}
       - TZ=${TIMEZONE}
-      # Importante para o n8n saber onde ele mora
       - N8N_HOST=${CADDY_DOMAIN}
       - WEBHOOK_URL=https://n8n.${CADDY_DOMAIN}/
     volumes:
       - ${PORTAINER_PATH}/data/n8n:/home/node/.n8n
     networks:
-      - default
+      - web-proxy
 
-  # --- DNS & REDE (Agora com AdGuard) ---
-  adguardhome:
-    image: adguard/adguardhome
-    container_name: adguardhome
-    restart: unless-stopped
-    network_mode: host
-    volumes:
-      - ${PORTAINER_PATH}/data/adguard/work:/opt/adguardhome/work
-      - ${PORTAINER_PATH}/data/adguard/conf:/opt/adguardhome/conf
-
-  # --- CASA INTELIGENTE ---
+  # --- 5. CASA INTELIGENTE (Home Assistant) ---
   homeassistant:
     image: lscr.io/linuxserver/homeassistant:latest
     container_name: homeassistant
     restart: unless-stopped
-    # Rede HOST é crítica para Home Assistant descobrir dispositivos IoT
+    # Rede HOST é obrigatória para ele descobrir dispositivos IoT na rede real
     network_mode: host
     environment:
       - PUID=${PUID}
@@ -59,6 +74,46 @@ services:
       - ${PORTAINER_PATH}/data/homeassistant:/config
       - /run/dbus:/run/dbus:ro
 
+  # --- 6. MÍDIA (Jellyfin) ---
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ${PORTAINER_PATH}/data/jellyfin:/config
+      # Mapeia o HDD de 1TB (Mídia)
+      - ${MEDIA_PATH}:/data/media
+    devices:
+      # Habilita Transcoding de Vídeo (Intel QuickSync do seu i5)
+      - /dev/dri:/dev/dri
+    networks:
+      - web-proxy
+
+  # --- 7. DOWNLOADS (Qbittorrent) ---
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+      - WEBUI_PORT=8080
+    volumes:
+      - ${PORTAINER_PATH}/data/qbittorrent:/config
+      # Mapeia o HDD de 500GB (Downloads)
+      - ${DOWNLOAD_PATH}:/downloads
+    ports:
+      - "6881:6881"
+      - "6881:6881/udp"
+      - "8080:8080" # WebUI
+    networks:
+      - web-proxy
+
 networks:
-  default:
+  web-proxy:
     driver: bridge
