@@ -5,7 +5,7 @@
 
 # Página inicial - HTTP simples
 http://{$CADDY_DOMAIN:localhost} {
-    respond "Bem-vindo ao Homelab!" 200
+    reverse_proxy https://192.168.1.2:9443
 }
 
 # AdGuard - HTTP (não precisa HTTPS)
