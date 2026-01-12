@@ -1,3 +1,8 @@
+{
+    # Habilita certificados auto-assinados para domínios locais
+    local_certs
+}
+
 # Página inicial - HTTP simples
 http://{$CADDY_DOMAIN:localhost} {
     respond "Bem-vindo ao Homelab!" 200
