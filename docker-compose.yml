@@ -22,6 +22,7 @@ services:
       - "443:443/udp" # HTTP/3
     environment:
       - CADDY_DOMAIN=$CADDY_DOMAIN
+      - ADGUARD_PORT=${ADGUARD_PORT:-8081}
     volumes:
       - ${PORTAINER_PATH}/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
