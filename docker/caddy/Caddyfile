@@ -1,4 +1,7 @@
-adguard.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy localhost:8081
+http://adguard.homelab.local {
+    reverse_proxy localhost:80
 }
 
+http://n8n.homelab.local {
+    reverse_proxy n8n:5678
+}
