@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   # AdGuard Home - DNS-level ad blocking
   adguard:
@@ -6,8 +8,8 @@ services:
     restart: unless-stopped
     network_mode: host
     volumes:
-      - ${PORTAINER_PATH}/docker/adguard/work:/opt/adguardhome/work
-      - ${PORTAINER_PATH}/docker/adguard/conf:/opt/adguardhome/conf
+      - adguard_work:/opt/adguardhome/work
+      - adguard_conf:/opt/adguardhome/conf
 
   # Caddy - Reverse proxy with automatic HTTPS
   caddy:
@@ -17,16 +19,15 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "443:443/udp"  # HTTP/3
+      - "443:443/udp" # HTTP/3
     volumes:
       - ${PORTAINER_PATH}/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
-      - ${PORTAINER_PATH}/docker/caddy/data:/data
-      - ${PORTAINER_PATH}/docker/caddy/config:/config
+      - caddy_data:/data
+      - caddy_config:/config
     networks:
       - homelab
     depends_on:
       - n8n
-      - adguard
 
   # n8n - Workflow automation
   n8n:
@@ -38,12 +39,24 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678/}
-      - GENERIC_TIMEZONE=${TIMEZONE:-America/New_York}
+      - GENERIC_TIMEZONE=${TIMEZONE:-America/Sao_Paulo}
     volumes:
-      - ${PORTAINER_PATH}/docker/n8n:/home/node/.n8n
+      - n8n_data:/home/node/.n8n
     networks:
       - homelab
 
 networks:
   homelab:
     driver: bridge
+
+volumes:
+  adguard_work:
+    driver: local
+  adguard_conf:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
+  n8n_data:
+    driver: local
