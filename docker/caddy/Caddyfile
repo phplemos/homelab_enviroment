@@ -1,15 +1,15 @@
 # Página inicial - HTTP simples
-http://${CADDY_DOMAIN:localhost} {
+http://{$CADDY_DOMAIN:localhost} {
     respond "Bem-vindo ao Homelab!" 200
 }
 
 
 # AdGuard - HTTP (não precisa HTTPS)
-http://adguard.{$CADDY_DOMAIN:home.local} {
+http://adguard.{$CADDY_DOMAIN:localhost} {
     reverse_proxy adguard:80
 }
 
 # n8n - HTTPS obrigatório
-https://n8n.{$CADDY_DOMAIN:home.local} {
+https://n8n.{$CADDY_DOMAIN:localhost} {
     reverse_proxy n8n:5678
 }
