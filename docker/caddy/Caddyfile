@@ -1,7 +1,8 @@
-http://adguard.homelab.local {
+http://adguard.{$CADDY_DOMAIN:localhost}  {
     reverse_proxy 192.168.1.2:8081
 }
 
-http://n8n.homelab.local {
+https://n8n.{$CADDY_DOMAIN:localhost} {
+    tls internal
     reverse_proxy n8n:5678
 }
