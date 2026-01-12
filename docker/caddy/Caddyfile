@@ -4,7 +4,7 @@
 }
 
 # Página inicial - HTTP simples
-http://{$CADDY_DOMAIN:localhost} {
+https://{$CADDY_DOMAIN:localhost} {
     reverse_proxy https://192.168.1.2:9443
 }
 
