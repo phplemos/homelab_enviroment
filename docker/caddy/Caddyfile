@@ -11,7 +11,7 @@ http://{$CADDY_DOMAIN:localhost} {
 
 # AdGuard - HTTP (não precisa HTTPS)
 http://adguard.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy {$SERVERIP}:{$ADGUARD_PORT:8081}
+    reverse_proxy {$SERVERIP:localhost}:8081
 }
 
 # n8n - HTTPS obrigatório
