@@ -1,5 +1,4 @@
 adguard.{$CADDY_DOMAIN:localhost} {
-    tls internal
     reverse_proxy localhost:8081
 }
 
