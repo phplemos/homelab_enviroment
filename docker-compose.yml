@@ -56,6 +56,19 @@ services:
       - evolution_instances:/evolution/instances
     networks:
       - homelab
+  postgres-main:
+    image: postgres:16-alpine 
+    container_name: postgres-main
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${PG_ROOT_PASSWORD} 
+      TZ: America/Sao_Paulo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data 
+    networks:
+      - homelab # Rede compartilhada
+    # Otimização básica para não matar seu servidor se tiver pouca RAM
+    command: postgres -c 'max_connections=200' -c 'shared_buffers=256MB'
 
 networks:
   homelab:
@@ -75,4 +88,6 @@ volumes:
   evolution_store:
     driver: local
   evolution_instances:
+    driver: local
+  postgres_data:
     driver: local
