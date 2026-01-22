@@ -10,7 +10,7 @@ http://n8n.{$CADDY_DOMAIN:localhost} {
 
 # Portainer - Atenção aqui! Use a porta 9000 (HTTP) e não a 9443 (HTTPS)
 http://portainer.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy 192.168.1.2:9443
+    reverse_proxy https://192.168.1.2:9443
 }
 
 # AdGuard
