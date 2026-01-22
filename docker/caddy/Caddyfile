@@ -1,19 +1,24 @@
 {
-    # Habilita certificados auto-assinados para domínios locais
-    local_certs
+    # Desativa a tentativa do Caddy de gerar certificados, pois o Cloudflare já faz isso
+    auto_https off
 }
 
-# Página inicial - HTTP simples
-https://{$CADDY_DOMAIN:localhost} {
-    reverse_proxy https://192.168.1.2:9443
-}
-
-# AdGuard - HTTP (não precisa HTTPS)
-http://adguard.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy http://192.168.1.2:8081
-}
-
-# n8n - HTTPS obrigatório
-https://n8n.{$CADDY_DOMAIN:localhost} {
+# n8n - Escuta na porta 80, responde pelo domínio
+http://n8n.{$CADDY_DOMAIN:localhost} {
     reverse_proxy n8n:5678
+}
+
+# Portainer - Atenção aqui! Use a porta 9000 (HTTP) e não a 9443 (HTTPS)
+http://portainer.{$CADDY_DOMAIN:localhost} {
+    reverse_proxy 192.168.1.2:9443
+}
+
+# AdGuard
+http://adguard.{$CADDY_DOMAIN:localhost} {
+    reverse_proxy 192.168.1.2:8081
+}
+
+# Página padrão (opcional)
+http://{$CADDY_DOMAIN:localhost} {
+    respond "Servidor Caddy Rodando via Tunnel!" 200
 }

@@ -1,4 +1,7 @@
 # Ignore data folders
 data/*/*
+# Ignore configuration files
+docker/n8n
+
 
 .env

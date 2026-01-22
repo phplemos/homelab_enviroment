@@ -40,7 +40,7 @@ services:
       - N8N_HOST=${N8N_HOST:-localhost}
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
-      - WEBHOOK_URL=https://n8n.${CADDY_DOMAIN:-localhost}
+      - WEBHOOK_URL=https://n8n.${CADDY_DOMAIN}
       - GENERIC_TIMEZONE=${TIMEZONE:-America/Sao_Paulo}
     volumes:
       - n8n_data:/home/node/.n8n
