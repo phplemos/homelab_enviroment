@@ -49,13 +49,13 @@ services:
     container_name: evolution_api
     image: atendai/evolution-api
     restart: always
-    ports:
-      - "8080:8080"
     env_file:
       - .env
     volumes:
       - evolution_store:/evolution/store
       - evolution_instances:/evolution/instances
+    networks:
+      - homelab
 
 networks:
   homelab:

@@ -8,6 +8,17 @@ http://n8n.{$CADDY_DOMAIN:localhost} {
     reverse_proxy n8n:5678
 }
 
+# Evolution API (Whatsapp) - Escuta na porta 80, responde pelo domínio
+http://evapi.{$CADDY_DOMAIN:localhost} {
+    reverse_proxy evolution_api:8080 {
+        transport http {
+            tls
+            tls_insecure_skip_verify
+        }
+    }
+}
+
+
 # Portainer - Atenção aqui! Use a porta 9000 (HTTP) e não a 9443 (HTTPS)
 http://portainer.{$CADDY_DOMAIN:localhost} {
     reverse_proxy https://192.168.1.2:9443 {
