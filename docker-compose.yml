@@ -49,8 +49,8 @@ services:
     container_name: evolution_api
     image: atendai/evolution-api
     restart: always
-    env_file:
-      - .env
+    environment:
+      - AUTHENTICATION_API_KEY=${AUTHENTICATION_API_KEY}
     volumes:
       - evolution_store:/evolution/store
       - evolution_instances:/evolution/instances
