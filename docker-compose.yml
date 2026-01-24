@@ -17,7 +17,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     networks:
-      - homelab
+      - internal
     depends_on:
       - n8n
   # AdGuard Home - DNS-level ad blocking
@@ -44,34 +44,40 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
     networks:
-      - homelab
+      - internal
   evolution-api:
     container_name: evolution_api
     image: atendai/evolution-api
     restart: always
     environment:
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_HOST=postgres-main
+      - DATABASE_PORT=5432
+      - DATABASE_USER=evolution_user
+      - DATABASE_PASSWORD=senha_segura_evolution
+      - DATABASE_NAME=evolution_db
       - AUTHENTICATION_API_KEY=${AUTHENTICATION_API_KEY}
     volumes:
       - evolution_store:/evolution/store
       - evolution_instances:/evolution/instances
     networks:
-      - homelab
+      - internal
   postgres-main:
-    image: postgres:16-alpine 
+    image: postgres:16-alpine
     container_name: postgres-main
     restart: always
     environment:
-      POSTGRES_PASSWORD: ${PG_ROOT_PASSWORD} 
+      POSTGRES_PASSWORD: ${PG_ROOT_PASSWORD}
       TZ: America/Sao_Paulo
     volumes:
-      - postgres_data:/var/lib/postgresql/data 
+      - postgres_data:/var/lib/postgresql/data
     networks:
-      - homelab # Rede compartilhada
+      - internal
     # Otimização básica para não matar seu servidor se tiver pouca RAM
     command: postgres -c 'max_connections=200' -c 'shared_buffers=256MB'
 
 networks:
-  homelab:
+  internal:
     driver: bridge
 
 volumes:
