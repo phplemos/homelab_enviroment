@@ -38,3 +38,12 @@ http://adguard.{$CADDY_DOMAIN:localhost} {
 http://{$CADDY_DOMAIN:localhost} {
     respond "Servidor Caddy Rodando via Tunnel!" 200
 }
+
+http://chatmanager.{$CADDY_DOMAIN:localhost} {
+    reverse_proxy chatmanager_app:3000 {
+        transport http {
+            tls
+            tls_insecure_skip_verify
+        }
+    }
+}
