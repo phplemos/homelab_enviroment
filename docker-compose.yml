@@ -41,6 +41,7 @@ services:
       - N8N_PROTOCOL=https
       - WEBHOOK_URL=https://n8n.${CADDY_DOMAIN}
       - GENERIC_TIMEZONE=${TIMEZONE:-America/Sao_Paulo}
+      - N8N_PROXY_HOPS=1 # Necessário para confiar no proxy (Caddy/Cloudflare)
     volumes:
       - n8n_data:/home/node/.n8n
     networks:
@@ -107,7 +108,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${EVOLUTION_DB_USER} -d ${EVOLUTION_DB_NAME}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${EVOLUTION_DB_USER} -d ${EVOLUTION_DB_NAME}" ]
       interval: 10s
       timeout: 5s
       retries: 5
