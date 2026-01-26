@@ -64,6 +64,7 @@ services:
     container_name: evolution-api
     restart: unless-stopped
     environment:
+      SERVER_URL: https://evapi.${CADDY_DOMAIN}/
       # Database
       DATABASE_ENABLED: "true"
       DATABASE_PROVIDER: "postgresql"
@@ -78,7 +79,7 @@ services:
       # Auth
       AUTHENTICATION_API_KEY: ${AUTHENTICATION_API_KEY}
       # Logging
-      LOG_LEVEL: "WARN"
+      LOG_LEVEL: "DEBUG"
       DEL_INSTANCE: "false"
     volumes:
       - evolution_instances:/evolution/instances
