@@ -64,7 +64,7 @@ services:
     container_name: evolution-api
     restart: unless-stopped
     environment:
-      SERVER_URL: https://evapi.${CADDY_DOMAIN}/
+      SERVER_URL: https://evapi.${CADDY_DOMAIN}
       # Database
       DATABASE_ENABLED: "true"
       DATABASE_PROVIDER: "postgresql"
