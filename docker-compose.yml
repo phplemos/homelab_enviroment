@@ -90,12 +90,14 @@ services:
           cpus: '${CPU_LIMIT_APP}'
           memory: '${MEM_LIMIT_APP}'
     depends_on:
-      - postgres-main
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
-  postgres-main:
+  postgres:
     image: postgres:16-alpine
-    container_name: postgres-main
+    container_name: postgres
     restart: always
     environment:
       POSTGRES_USER: ${EVOLUTION_DB_USER}
@@ -104,6 +106,11 @@ services:
       TZ: ${TIMEZONE}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${EVOLUTION_DB_USER} -d ${EVOLUTION_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       internal:
         aliases:
