@@ -45,30 +45,63 @@ services:
       - n8n_data:/home/node/.n8n
     networks:
       - internal
-  evolution-api:
-    container_name: evolution_api
-    image: atendai/evolution-api
-    restart: always
-    environment:
-      - DATABASE_PROVIDER=postgresql
-      - DATABASE_HOST=postgres-main
-      - DATABASE_PORT=5432
-      - DATABASE_USER=evolution_user
-      - DATABASE_PASSWORD=senha_segura_evolution
-      - DATABASE_NAME=evolution_db
-      - AUTHENTICATION_API_KEY=${AUTHENTICATION_API_KEY}
+
+  # Redis - Cache for Evolution API
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
     volumes:
-      - evolution_store:/evolution/store
-      - evolution_instances:/evolution/instances
+      - redis_data:/data
     networks:
       - internal
+
+  # Evolution API - WhatsApp API
+  evolution-api:
+    image: atendai/evolution-api:v2.2.2
+    container_name: evolution-api
+    restart: unless-stopped
+    environment:
+      # Database
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: "postgresql"
+      DATABASE_CONNECTION_URI: "postgresql://${EVOLUTION_DB_USER}:${EVOLUTION_DB_PASSWORD}@${EVOLUTION_DB_HOST}:${EVOLUTION_DB_PORT}/${EVOLUTION_DB_NAME}"
+      DATABASE_CONNECTION_CLIENT_NAME: "evolution_v2"
+      DATABASE_SAVE_DATA_NEW_MESSAGE: "false"
+      DATABASE_SAVE_MESSAGE_UPDATE: "false"
+      DATABASE_SAVE_DATA_CONTACTS: "true"
+      # Redis
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: "redis://${REDIS_HOST}:${REDIS_PORT}/1"
+      # Auth
+      AUTHENTICATION_API_KEY: ${AUTHENTICATION_API_KEY}
+      # Logging
+      LOG_LEVEL: "WARN"
+      DEL_INSTANCE: "false"
+    volumes:
+      - evolution_instances:/evolution/instances
+      - evolution_store:/evolution/store
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '${CPU_LIMIT_APP}'
+          memory: '${MEM_LIMIT_APP}'
+    depends_on:
+      - postgres-main
+      - redis
+
   postgres-main:
     image: postgres:16-alpine
     container_name: postgres-main
     restart: always
     environment:
-      POSTGRES_PASSWORD: ${PG_ROOT_PASSWORD}
-      TZ: America/Sao_Paulo
+      POSTGRES_USER: ${EVOLUTION_DB_USER}
+      POSTGRES_PASSWORD: ${EVOLUTION_DB_PASSWORD}
+      POSTGRES_DB: ${EVOLUTION_DB_NAME}
+      TZ: ${TIMEZONE}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -96,4 +129,6 @@ volumes:
   evolution_instances:
     driver: local
   postgres_data:
+    driver: local
+  redis_data:
     driver: local
