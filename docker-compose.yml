@@ -60,7 +60,7 @@ services:
 
   # Evolution API - WhatsApp API
   evolution-api:
-    image: atendai/evolution-api:v2.2.2
+    image: evoapicloud/evolution-api:v2.3.7
     container_name: evolution-api
     restart: unless-stopped
     environment:
