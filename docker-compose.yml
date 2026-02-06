@@ -126,6 +126,8 @@ services:
 networks:
   internal:
     driver: bridge
+  uniespacos_uniespacos-production:
+    external: true
 
 volumes:
   adguard_work:
