@@ -18,6 +18,7 @@ services:
       - caddy_config:/config
     networks:
       - internal
+      - uniespacos_uniespacos-production
     depends_on:
       - n8n
   # AdGuard Home - DNS-level ad blocking
@@ -46,7 +47,6 @@ services:
       - n8n_data:/home/node/.n8n
     networks:
       - internal
-
   # Redis - Cache for Evolution API
   redis:
     image: redis:alpine
