@@ -39,11 +39,10 @@ http://chatmanager.{$CADDY_DOMAIN:localhost} {
         header_up Host {host}
         header_up X-Real-IP {remote_host}
         header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto https  # <--- THIS IS THE KEY LINE
+        header_up X-Forwarded-Proto https  
     }
 }
 
 http://uniespacos.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy web-production:8298
-
+    reverse_proxy web-production:80
 }
