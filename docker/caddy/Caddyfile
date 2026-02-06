@@ -44,7 +44,7 @@ http://chatmanager.{$CADDY_DOMAIN:localhost} {
 }
 
 http://uniespacos.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy uniespacos_app:80 {
+    reverse_proxy uniespacos_app:8298 {
         header_up Host {host}
         header_up X-Real-IP {remote_host}
         header_up X-Forwarded-For {remote_host}
