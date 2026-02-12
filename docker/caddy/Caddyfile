@@ -34,15 +34,19 @@ http://{$CADDY_DOMAIN:localhost} {
     respond "Servidor Caddy Rodando via Tunnel!" 200
 }
 
-http://chatmanager.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy chatmanager_app:3000 {
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto https  
-    }
-}
-
 http://uniespacos.{$CADDY_DOMAIN:localhost} {
     reverse_proxy web-production:80
+}
+
+# Duoscale Staging Services - Proxied to Traefik
+http://api.duoscale.duvidoso.tech {
+    reverse_proxy 192.168.1.2:8080
+}
+
+http://n8n.duoscale.duvidoso.tech {
+    reverse_proxy 192.168.1.2:8080
+}
+
+http://chatwoot.duoscale.duvidoso.tech {
+    reverse_proxy 192.168.1.2:8080
 }
