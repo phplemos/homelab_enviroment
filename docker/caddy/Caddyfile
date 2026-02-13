@@ -37,16 +37,3 @@ http://{$CADDY_DOMAIN:localhost} {
 http://uniespacos.{$CADDY_DOMAIN:localhost} {
     reverse_proxy web-production:80
 }
-
-# Duoscale Staging Services - Proxied to Traefik
-http://api.duoscale.duvidoso.tech {
-    reverse_proxy traefik:80
-}
-
-http://n8n.duoscale.duvidoso.tech {
-    reverse_proxy traefik:80
-}
-
-http://chatwoot.duoscale.duvidoso.tech {
-    reverse_proxy traefik:80
-}

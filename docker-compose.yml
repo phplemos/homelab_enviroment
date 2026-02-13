@@ -7,9 +7,7 @@ services:
     container_name: caddy
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp" # HTTP/3
+      - "20300:80"
     environment:
       - CADDY_DOMAIN=$CADDY_DOMAIN
     volumes:
@@ -18,7 +16,6 @@ services:
       - caddy_config:/config
     networks:
       - internal
-      - uniespacos_uniespacos-production
     depends_on:
       - n8n
   # AdGuard Home - DNS-level ad blocking
@@ -126,8 +123,6 @@ services:
 networks:
   internal:
     driver: bridge
-  uniespacos_uniespacos-production:
-    external: true
 
 volumes:
   adguard_work:
