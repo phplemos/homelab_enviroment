@@ -13,7 +13,6 @@ http://evapi.{$CADDY_DOMAIN:localhost} {
     reverse_proxy evolution-api:8080
 }
 
-
 # Portainer - Atenção aqui! Use a porta 9000 (HTTP) e não a 9443 (HTTPS)
 http://portainer.{$CADDY_DOMAIN:localhost} {
     reverse_proxy https://192.168.1.2:9443 {
@@ -32,8 +31,4 @@ http://adguard.{$CADDY_DOMAIN:localhost} {
 # Página padrão (opcional)
 http://{$CADDY_DOMAIN:localhost} {
     respond "Servidor Caddy Rodando via Tunnel!" 200
-}
-
-http://uniespacos.{$CADDY_DOMAIN:localhost} {
-    reverse_proxy web-production:80
 }
