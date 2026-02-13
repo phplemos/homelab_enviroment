@@ -6,7 +6,7 @@ Tudo é orquestrado via Docker Compose, facilitando a manutenção e portabilida
 
 ## 🚀 Serviços e Funcionalidades
 
-A stack atual, acessível via Cloudflare Tunnel (`duvidoso.tech`), é composta pelos seguintes serviços:
+A stack atual, acessível via Cloudflare Tunnel (`{$CADDY_DOMAIN}`), é composta pelos seguintes serviços:
 
 ### 🛡️ Privacidade & Rede
 
@@ -97,10 +97,17 @@ Configurado no `docker/caddy/Caddyfile`:
 | **n8n** | `https://n8n.duvidoso.tech` | Editor de fluxos |
 | **Evolution API** | `https://evapi.duvidoso.tech` | Documentação Swagger / API |
 | **Portainer** | `https://portainer.duvidoso.tech` | Gestão Docker |
-| **AdGuard** | `https://adguard.duvidoso.tech` | Admin do DNS Block |
+| **AdGuard** | `https://adguard.{$CADDY_DOMAIN}` | Admin do DNS Block |
 
-## 📚 Futuras Implementações
+## 📚 Roadmap
 
+### ✅ Concluído Recentemente
+* [x] Refatoração da configuração do Caddy para isolar ambientes.
+
+### 🚀 Futuras Implementações
+* [ ] Estratégia de backup para volumes persistentes.
+* [ ] Scan de segurança para os containers.
 * [ ] Dashboard unificado (Homepage ou Dashy).
 * [ ] Home Assistant para dispositivos Zigbee/Tuya.
 * [ ] Monitoramento com Prometheus + Grafana.
+* [ ] Logging centralizado com Loki.
